@@ -1,0 +1,26 @@
+package com.example.data.db.entity;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity
+@Table(name = "employees")
+@Getter
+@Setter
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String fullName;
+    private Long positionId;
+
+    @OneToMany(mappedBy = "employee")
+    private Set<CarRent> carRentEntities;
+
+    @ManyToOne
+    @JoinColumn(name = "positionId", insertable = false, updatable = false)
+    private Position position;
+}
