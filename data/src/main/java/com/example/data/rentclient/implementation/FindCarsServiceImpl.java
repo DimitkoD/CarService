@@ -1,8 +1,8 @@
 package com.example.data.rentclient.implementation;
 
 import com.example.api.ApiFeignInterface;
-import com.example.api.operation2.ApiRequest;
-import com.example.api.operation2.ApiResponse;
+import com.example.api.operationApi.ApiRequest;
+import com.example.api.operationApi.ApiResponse;
 import com.example.data.db.repository.CarRepository;
 import com.example.data.rentclient.FindCarsService;
 import com.example.data.rentclient.mapper.CarMapper;

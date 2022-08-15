@@ -1,6 +1,6 @@
 package com.example.data.rentclient;
 
-import com.example.api.operation2.ApiResponse;
+import com.example.api.operationApi.ApiResponse;
 
 public interface FindCarsService {
     ApiResponse getCars(String status);
