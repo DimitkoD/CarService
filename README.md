@@ -5,7 +5,9 @@
 Client -> Id, Name, Address;
 Employee -> Id, Name, Address, Position; Rent -> Id, CarId, ClientId, EmployeeId, Date;
 
-Бизнес логика: •	CRUD заявки за коли.
+Бизнес логика:
+
+•	CRUD заявки за коли.
 
 •	Хора, които ще наемат колите, които ще се добавят допълнително, ако ги няма.
 
