@@ -1,18 +1,18 @@
 package com.example.core.processor;
 
 import com.example.api.base.Error;
+import com.example.api.error.ApiServiceError;
 import com.example.api.error.CarNotFoundError;
 import com.example.api.error.RentServiceUnavailable;
 import com.example.api.model.FindCarsResponse;
 import com.example.api.model.FindCarsRequest;
-
 import com.example.api.operation.GetCarsProcessor;
 import com.example.data.rentclient.FindCarsService;
+import com.example.data.rentclient.exception.ApiException;
 import com.example.data.rentclient.exception.CarNotFoundException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class GetCarsProcessorCore implements GetCarsProcessor {
@@ -39,6 +39,9 @@ public class GetCarsProcessorCore implements GetCarsProcessor {
         .mapLeft(throwable -> {
             if(throwable instanceof CarNotFoundException) {
                 return new CarNotFoundError();
+            }
+            if(throwable instanceof ApiException) {
+                return new ApiServiceError();
             }
             return new RentServiceUnavailable();
         });

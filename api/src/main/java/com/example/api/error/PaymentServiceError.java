@@ -3,14 +3,14 @@ package com.example.api.error;
 import com.example.api.base.Error;
 import org.springframework.http.HttpStatus;
 
-public class CarNotFoundError implements Error {
+public class PaymentServiceError implements Error {
     @Override
     public HttpStatus getCode() {
-        return HttpStatus.NOT_FOUND;
+        return HttpStatus.SERVICE_UNAVAILABLE;
     }
 
     @Override
     public String getMessage() {
-        return "Car is not available!!!";
+        return "Payment service not responding!!!";
     }
 }

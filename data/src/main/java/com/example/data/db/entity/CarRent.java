@@ -1,7 +1,6 @@
 package com.example.data.db.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -10,12 +9,15 @@ import java.time.LocalDate;
 @Table(name = "rents")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CarRent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long carId;
-    private Long personId;
+    private Long customerId;
     private Long employeeId;
     private Integer days;
     private Double price;
