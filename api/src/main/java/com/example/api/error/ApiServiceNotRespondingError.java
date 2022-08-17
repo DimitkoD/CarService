@@ -3,14 +3,14 @@ package com.example.api.error;
 import com.example.api.base.Error;
 import org.springframework.http.HttpStatus;
 
-public class PaymentServiceError implements Error {
+public class ApiServiceNotRespondingError implements Error {
     @Override
     public HttpStatus getCode() {
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.SERVICE_UNAVAILABLE;
     }
 
     @Override
     public String getMessage() {
-        return "Payment Service Internal Error!!!";
+        return "Api service not responding!!!";
     }
 }

@@ -15,7 +15,7 @@ public class Car {
     private Long carId;
     private String vin;
     private double price;
-    private String status;
+    private Boolean status;
 
     @OneToMany(mappedBy = "car")
     private Set<CarRent> carRentEntities;

@@ -3,14 +3,14 @@ package com.example.api.error;
 import com.example.api.base.Error;
 import org.springframework.http.HttpStatus;
 
-public class PaymentServiceError implements Error {
+public class RentNotFoundError implements Error {
     @Override
     public HttpStatus getCode() {
-        return HttpStatus.BAD_REQUEST;
+        return HttpStatus.NOT_FOUND;
     }
 
     @Override
     public String getMessage() {
-        return "Payment Service Internal Error!!!";
+        return "This rent record does not exist!!!";
     }
 }

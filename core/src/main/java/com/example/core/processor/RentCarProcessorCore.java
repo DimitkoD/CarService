@@ -1,19 +1,15 @@
 package com.example.core.processor;
 
 import com.example.api.base.Error;
-import com.example.api.error.CarNotFoundError;
-import com.example.api.error.PaymentServiceError;
-import com.example.api.error.RentServiceUnavailable;
+import com.example.api.error.*;
 import com.example.api.model.RentACarRequest;
 import com.example.api.model.RentACarResponse;
 import com.example.api.operation.RentCarProcessor;
 import com.example.data.rentclient.RentCarService;
-import com.example.data.rentclient.exception.PaymentServiceException;
+import com.example.data.rentclient.exception.*;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 public class RentCarProcessorCore implements RentCarProcessor {
@@ -26,10 +22,7 @@ public class RentCarProcessorCore implements RentCarProcessor {
     @Override
     public Either<Error, RentACarResponse> process(RentACarRequest input) {
         return Try.of(() -> {
-            return RentACarResponse
-                .builder()
-                .output(
-                    rentCarService
+            return rentCarService
                         .rentACar(
                             RentACarRequest
                                 .builder()
@@ -39,19 +32,30 @@ public class RentCarProcessorCore implements RentCarProcessor {
                                 .customerId(input.getCustomerId())
                                 .employeeId(input.getEmployeeId())
                                 .build()
-                        )
-                    .toString()
-                )
-                .build();
+                        );
         })
         .toEither()
         .mapLeft(throwable -> {
-            if(throwable instanceof NoSuchElementException) {
+
+            if(throwable instanceof PaymentServiceNotRespondingException) {
+                return new PaymentServiceNotRespondingError();
+            }
+            if(throwable instanceof CarNotFoundException) {
                 return new CarNotFoundError();
+            }
+            if(throwable instanceof EmployeeNotFoundException) {
+                return new EmployeeNotFoundError();
+            }
+            if(throwable instanceof CustomerNotFoundException) {
+                return new CustomerNotFoundError();
+            }
+            if(throwable instanceof CustomerHasAlreadyRentedException){
+                return new CustomerHasAlreadyRentedError();
             }
             if(throwable instanceof PaymentServiceException) {
                 return new PaymentServiceError();
             }
+
             return new RentServiceUnavailable();
         });
     }

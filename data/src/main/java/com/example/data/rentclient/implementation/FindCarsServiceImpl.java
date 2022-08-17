@@ -6,10 +6,12 @@ import com.example.api.operationApi.ApiResponse;
 import com.example.data.db.entity.Car;
 import com.example.data.db.repository.CarRepository;
 import com.example.data.rentclient.FindCarsService;
-import com.example.data.rentclient.exception.ApiException;
+import com.example.data.rentclient.exception.ApiServiceException;
+import com.example.data.rentclient.exception.ApiServiceNotRespondingException;
 import com.example.data.rentclient.exception.CarNotFoundException;
 import com.example.data.rentclient.mapper.CarMapper;
 import feign.FeignException;
+import feign.RetryableException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +29,7 @@ public class FindCarsServiceImpl implements FindCarsService {
         this.carMapper = carMapper;
     }
 
-    public ApiResponse getCars(String status) {
+    public ApiResponse getCars(Boolean status) {
 
         List<Car> cars =  carRepository
                 .findAllByStatus(status);
@@ -48,8 +50,12 @@ public class FindCarsServiceImpl implements FindCarsService {
                             )
                             .build()
                     );
-            } catch(FeignException.FeignClientException e) {
-                throw new ApiException();
-            }
+        }
+        catch(RetryableException e) {
+            throw new ApiServiceNotRespondingException();
+        }
+        catch (FeignException.FeignClientException e) {
+            throw new ApiServiceException();
+        }
     }
 }

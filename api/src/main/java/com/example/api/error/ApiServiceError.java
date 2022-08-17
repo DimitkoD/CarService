@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 public class ApiServiceError implements Error {
     @Override
     public HttpStatus getCode() {
-        return HttpStatus.SERVICE_UNAVAILABLE;
+        return HttpStatus.BAD_REQUEST;
     }
 
     @Override
     public String getMessage() {
-        return "Api service not responding!!!";
+        return "Api Service Internal Error!!!";
     }
 }
