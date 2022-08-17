@@ -38,6 +38,7 @@ public class ReturnCarServiceImpl implements ReturnCarService {
                                    carRepository
                                             .findCarByVin(carRent.getCar().getVin())
                                             .orElseThrow())
+                                .toList()
                                 .toString()
                 )
                 .build();
