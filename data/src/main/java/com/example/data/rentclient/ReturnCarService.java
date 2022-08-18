@@ -4,5 +4,5 @@ import com.example.api.model.ReturnCarRequest;
 import com.example.api.model.ReturnCarResponse;
 
 public interface ReturnCarService {
-    ReturnCarResponse returnCar(ReturnCarRequest returnCarRequest);
+    Boolean returnCar(ReturnCarRequest returnCarRequest);
 }

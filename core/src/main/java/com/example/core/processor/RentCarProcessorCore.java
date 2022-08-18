@@ -22,19 +22,10 @@ public class RentCarProcessorCore implements RentCarProcessor {
     }
 
     @Override
-    public Either<Error, RentACarResponse> process(RentACarRequest input) {
+    public Either<Error, RentACarResponse> process(RentACarRequest rentACarRequest) {
         return Try.of(() -> {
             return rentCarService
-                        .rentACar(
-                            RentACarRequest
-                                .builder()
-                                .carVin(input.getCarVin())
-                                .cardNumber(input.getCardNumber())
-                                .days(input.getDays())
-                                .customerId(input.getCustomerId())
-                                .employeeId(input.getEmployeeId())
-                                .build()
-                        );
+                        .rentACar(rentACarRequest);
         })
         .toEither()
         .mapLeft(throwable -> {
