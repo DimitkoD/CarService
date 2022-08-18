@@ -1,7 +1,7 @@
 package com.example.data.rentclient;
 
-import com.example.api.operationApi.ApiResponse;
+import com.example.api.model.GetCarsResponse;
 
 public interface FindCarsService {
-    ApiResponse getCars(Boolean status);
+    GetCarsResponse getCars(Boolean status);
 }

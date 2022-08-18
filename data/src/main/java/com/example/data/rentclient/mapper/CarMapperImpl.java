@@ -1,6 +1,6 @@
 package com.example.data.rentclient.mapper;
 
-import com.example.api.operationApi.CarApiEntity;
+import com.example.api.model.CarApiEntity;
 import org.springframework.stereotype.Service;
 
 @Service

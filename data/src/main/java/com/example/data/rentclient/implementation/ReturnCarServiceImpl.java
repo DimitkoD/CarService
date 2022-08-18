@@ -38,7 +38,12 @@ public class ReturnCarServiceImpl implements ReturnCarService {
                                    carRepository
                                             .findCarByVin(carRent.getCar().getVin())
                                             .orElseThrow())
-                                .toList()
+                                .map(car -> {
+                                    car.setStatus(false);
+                                    carRepository.save(car);
+
+                                    return "Car return is successful!!!";
+                                })
                                 .toString()
                 )
                 .build();

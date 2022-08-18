@@ -2,7 +2,7 @@ package com.example.rest.controller;
 
 import com.example.api.base.Error;
 import com.example.api.model.*;
-import com.example.api.operation.GetCarsProcessor;
+import com.example.api.operation.GetCarsInfoProcessor;
 import com.example.api.operation.RentCarProcessor;
 import com.example.api.operation.ReturnCarProcessor;
 import io.vavr.control.Either;
@@ -14,19 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
-    public final GetCarsProcessor getCarsProcessor;
+    public final GetCarsInfoProcessor getCarsInfoProcessor;
     public final RentCarProcessor rentCarProcessor;
     private final ReturnCarProcessor returnCarProcessor;
 
-    public HomeController(GetCarsProcessor getCarsProcessor, RentCarProcessor rentCarProcessor, ReturnCarProcessor returnCarProcessor) {
-        this.getCarsProcessor = getCarsProcessor;
+    public HomeController(GetCarsInfoProcessor getCarsInfoProcessor, RentCarProcessor rentCarProcessor, ReturnCarProcessor returnCarProcessor) {
+        this.getCarsInfoProcessor = getCarsInfoProcessor;
         this.rentCarProcessor = rentCarProcessor;
         this.returnCarProcessor = returnCarProcessor;
     }
 
     @PostMapping("/getCars")
     public ResponseEntity<?> getCarsByStatus(@RequestBody FindCarsRequest findCarsRequest) {
-        Either<Error, FindCarsResponse> result = getCarsProcessor.process(findCarsRequest);
+        Either<Error, FindCarsResponse> result = getCarsInfoProcessor.process(findCarsRequest);
         if(result.isLeft()){
             return ResponseEntity
                     .status(result.getLeft().getCode())

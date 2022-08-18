@@ -7,6 +7,8 @@ import com.example.api.model.RentACarResponse;
 import com.example.api.operation.RentCarProcessor;
 import com.example.data.rentclient.RentCarService;
 import com.example.data.rentclient.exception.*;
+import feign.FeignException;
+import feign.RetryableException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class RentCarProcessorCore implements RentCarProcessor {
         .toEither()
         .mapLeft(throwable -> {
 
-            if(throwable instanceof PaymentServiceNotRespondingException) {
+            if(throwable instanceof RetryableException) {
                 return new PaymentServiceNotRespondingError();
             }
             if(throwable instanceof CarNotFoundException) {
@@ -52,7 +54,7 @@ public class RentCarProcessorCore implements RentCarProcessor {
             if(throwable instanceof CustomerHasAlreadyRentedException){
                 return new CustomerHasAlreadyRentedError();
             }
-            if(throwable instanceof PaymentServiceException) {
+            if(throwable instanceof FeignException.FeignClientException) {
                 return new PaymentServiceError();
             }
 

@@ -7,6 +7,6 @@ import com.example.api.model.FindCarsResponse;
 import io.vavr.control.Either;
 
 
-public interface GetCarsProcessor extends OperationProcessor<FindCarsRequest, FindCarsResponse> {
+public interface GetCarsInfoProcessor extends OperationProcessor<FindCarsRequest, FindCarsResponse> {
     Either<Error, FindCarsResponse> process(FindCarsRequest findCarsRequest);
 }

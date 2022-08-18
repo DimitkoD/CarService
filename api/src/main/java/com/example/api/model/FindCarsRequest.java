@@ -1,5 +1,6 @@
 package com.example.api.model;
 
+
 import com.example.api.base.OperationInput;
 import lombok.Getter;
 import lombok.Setter;
