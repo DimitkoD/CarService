@@ -11,4 +11,6 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     List<Car> findAllByStatus(Boolean status);
     Optional<Car> findCarByStatusAndVin(Boolean status, String vin);
     Optional<Car> findCarByVin(String vin);
+
+    List<Car> findAll();
 }

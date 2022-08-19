@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface CarRentRepository extends JpaRepository<CarRent, Long> {
     List<CarRent> getCarRentByCarId(Long id);
+
 }

@@ -1,4 +1,4 @@
-package com.example.data.rentclient.exception;
+package com.example.core.exception;
 
 public class CustomerHasAlreadyRentedException extends RuntimeException{
 }

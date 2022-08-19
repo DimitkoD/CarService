@@ -8,30 +8,44 @@ import com.example.api.error.RentServiceUnavailable;
 import com.example.api.model.FindCarsResponse;
 import com.example.api.model.FindCarsRequest;
 import com.example.api.operation.GetCarsInfoProcessor;
+import com.example.data.db.entity.Car;
+import com.example.data.db.repository.CarRepository;
 import com.example.data.rentclient.FindCarsService;
-import com.example.data.rentclient.exception.CarNotFoundException;
+import com.example.core.exception.CarNotFoundException;
 import feign.FeignException;
 import feign.RetryableException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class GetCarsInfoProcessorCore implements GetCarsInfoProcessor {
 
     private final FindCarsService findCarsService;
-    public GetCarsInfoProcessorCore(FindCarsService findCarsService ) {
+    private final CarRepository carRepository;
+    public GetCarsInfoProcessorCore(FindCarsService findCarsService, CarRepository carRepository) {
         this.findCarsService = findCarsService;
+        this.carRepository = carRepository;
     }
 
     @Override
     public Either<Error, FindCarsResponse> process(FindCarsRequest findCarsRequest) {
         return Try.of(() -> {
+
+                    List<Car> cars =  carRepository
+                            .findAllByStatus(findCarsRequest.getStatus());
+
+                    if(cars.isEmpty()){
+                        throw new CarNotFoundException();
+                    }
+
            return FindCarsResponse
                    .builder()
                    .carsAvailable(
                            findCarsService
-                                   .getCars(findCarsRequest.getStatus())
+                                   .getCars(cars)
                                    .getCarsAvailable()
                    )
                    .build();
