@@ -4,9 +4,9 @@ import com.example.data.db.entity.CarRent;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CarRentRepository extends JpaRepository<CarRent, Long> {
-    List<CarRent> getCarRentByCarId(Long id);
-
+    List<CarRent> getCarRentsByCarId(Long id);
+    List<CarRent> getCarRentsByEmployeeId(Long id);
+    List<CarRent> findAll();
 }

@@ -43,7 +43,7 @@ public class ReturnCarProcessorCore implements ReturnCarProcessor {
                                     .map(carRentRepository -> {
 
                                                 List<CarRent> carRents = carRentRepository
-                                                        .getCarRentByCarId(
+                                                        .getCarRentsByCarId(
                                                                 returnCarRequest.getCarId()
                                                         );
 

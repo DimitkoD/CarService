@@ -2,10 +2,7 @@ package com.example.rest.controller;
 
 import com.example.api.base.Error;
 import com.example.api.model.*;
-import com.example.api.operation.GetCarsInfoProcessor;
-import com.example.api.operation.RentCarProcessor;
-import com.example.api.operation.ReturnCarProcessor;
-import com.example.api.operation.SortCarsProcessor;
+import com.example.api.operation.*;
 import io.vavr.control.Either;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +16,20 @@ public class HomeController {
     public final GetCarsInfoProcessor getCarsInfoProcessor;
     public final RentCarProcessor rentCarProcessor;
     private final ReturnCarProcessor returnCarProcessor;
-
     private final SortCarsProcessor sortCarsProcessor;
+    private final SortEmployeesProcessor sortEmployeesProcessor;
 
-    public HomeController(GetCarsInfoProcessor getCarsInfoProcessor, RentCarProcessor rentCarProcessor, ReturnCarProcessor returnCarProcessor, SortCarsProcessor sortCarsProcessor) {
+    public HomeController(GetCarsInfoProcessor getCarsInfoProcessor,
+                          RentCarProcessor rentCarProcessor,
+                          ReturnCarProcessor returnCarProcessor,
+                          SortCarsProcessor sortCarsProcessor,
+                          SortEmployeesProcessor sortEmployeesProcessor) {
+
         this.getCarsInfoProcessor = getCarsInfoProcessor;
         this.rentCarProcessor = rentCarProcessor;
         this.returnCarProcessor = returnCarProcessor;
         this.sortCarsProcessor = sortCarsProcessor;
+        this.sortEmployeesProcessor = sortEmployeesProcessor;
     }
 
     @PostMapping("/getCars")
@@ -65,6 +68,17 @@ public class HomeController {
     @PostMapping("/sortCarsByTimesRented")
     public ResponseEntity<?> sortCarsByTimesRented(@RequestBody SortCarsRequest sortCarsRequest) {
         Either<Error, SortCarsResponse> result = sortCarsProcessor.process(sortCarsRequest);
+        if(result.isLeft()){
+            return ResponseEntity
+                    .status(result.getLeft().getCode())
+                    .body(result.getLeft().getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(result.get());
+    }
+
+    @PostMapping("/sortEmployeesByTimesRented")
+    public ResponseEntity<?> sortEmployeesByTimesRented(@RequestBody SortEmployeesRequest sortEmployeesRequest) {
+        Either<Error, SortEmployeesResponse> result = sortEmployeesProcessor.process(sortEmployeesRequest);
         if(result.isLeft()){
             return ResponseEntity
                     .status(result.getLeft().getCode())

@@ -3,14 +3,14 @@ package com.example.core.processor;
 import com.example.api.base.Error;
 import com.example.api.error.RentServiceUnavailable;
 import com.example.api.error.RentsNotFoundError;
-import com.example.api.model.SortCarsRequest;
-import com.example.api.model.SortCarsResponse;
-import com.example.api.operation.SortCarsProcessor;
+import com.example.api.model.SortEmployeesRequest;
+import com.example.api.model.SortEmployeesResponse;
+import com.example.api.operation.SortEmployeesProcessor;
 import com.example.core.exception.RentsNotFoundException;
-import com.example.data.db.entity.Car;
 import com.example.data.db.entity.CarRent;
+import com.example.data.db.entity.Employee;
 import com.example.data.db.repository.CarRentRepository;
-import com.example.data.db.repository.CarRepository;
+import com.example.data.db.repository.EmployeeRepository;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
@@ -22,36 +22,36 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class SortCarsProcessorCore implements SortCarsProcessor {
-
+public class SortEmployeesProcessorCore implements SortEmployeesProcessor {
+    private final EmployeeRepository employeeRepository;
     private final CarRentRepository carRentRepository;
-    private final CarRepository carRepository;
 
-    public SortCarsProcessorCore(CarRentRepository carRentRepository, CarRepository carRepository) {
+    public SortEmployeesProcessorCore(EmployeeRepository employeeRepository, CarRentRepository carRentRepository) {
+        this.employeeRepository = employeeRepository;
         this.carRentRepository = carRentRepository;
-        this.carRepository = carRepository;
     }
 
     @Override
-    public Either<Error, SortCarsResponse> process(SortCarsRequest sortCarsRequest) {
+    public Either<Error, SortEmployeesResponse> process(SortEmployeesRequest sortEmployeesRequest) {
         return Try.of(() -> {
             List<CarRent> rents = carRentRepository.findAll();
+
             if(rents.isEmpty()) {
                 throw new RentsNotFoundException();
             }
 
-            return SortCarsResponse
+            return SortEmployeesResponse
                     .builder()
-                    .sortedCarsByTimesRented(
-                            carRepository
+                    .sortedEmployeesByTimesRented(
+                            employeeRepository
                                     .findAll()
                                     .stream()
                                     .collect(Collectors
                                             .toMap(
-                                                    Car::getVin,
-                                                    car -> {
+                                                    Employee::getFullName,
+                                                    employee -> {
                                                         List<CarRent> carRents = carRentRepository
-                                                                .getCarRentsByCarId(car.getCarId());
+                                                                .getCarRentsByEmployeeId(employee.getId());
 
                                                         return carRents.size();
                                                     }
@@ -61,8 +61,8 @@ public class SortCarsProcessorCore implements SortCarsProcessor {
                                     .stream()
                                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                                     .collect(Collectors.toMap(
-                                                Map.Entry::getKey, Map.Entry::getValue,
-                                                (e1, e2) -> e1, LinkedHashMap::new
+                                                    Map.Entry::getKey, Map.Entry::getValue,
+                                                    (e1, e2) -> e1, LinkedHashMap::new
                                             )
                                     )
                     )
