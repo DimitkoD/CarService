@@ -20,7 +20,6 @@ import com.example.data.db.repository.CarRepository;
 import com.example.data.db.repository.CustomerRepository;
 import com.example.data.db.repository.EmployeeRepository;
 import com.example.data.rentclient.PriceService;
-import com.example.data.rentclient.exception.*;
 import feign.FeignException;
 import feign.RetryableException;
 import io.vavr.control.Either;

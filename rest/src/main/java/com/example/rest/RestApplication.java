@@ -9,8 +9,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = {"com.example"})
-@EnableJpaRepositories(basePackages = "com.example")
-@EntityScan(basePackages = "com.example.data")
+//@EnableJpaRepositories
+//@EntityScan(basePackages = {
+//        "com.example.data.db.entity",
+//        "com.example.data.dbsecurity.entity"
+//})
 @ComponentScan(basePackages = {
         "com.example"
 })

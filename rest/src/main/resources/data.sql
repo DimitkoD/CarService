@@ -1,19 +1,19 @@
-INSERT IGNORE INTO positions(name) values
-('sales assistant'),
-('manager');
+INSERT IGNORE INTO positions(id, name) values
+(1, 'sales assistant'),
+(2, 'manager');
 
-INSERT IGNORE INTO cars(status, price, vin) values
-(false, 20, 'JH4DC4440RS004255'),
-(false, 25, 'SALVT2BG1CH654491'),
-(false, 40, '3D73Y3CL6BG585460'),
-(false, 50, '3D7KU28C63G798405');
+INSERT IGNORE INTO cars(carId, status, price, vin) values
+(1, false, 20, 'JH4DC4440RS004255'),
+(2, false, 25, 'SALVT2BG1CH654491'),
+(3, false, 40, '3D73Y3CL6BG585460'),
+(4, false, 50, '3D7KU28C63G798405');
 
-INSERT IGNORE INTO customers(full_name, customer_status) values
-('Dimitar Dobrev', false),
-('Ivan Ivanov', false),
-('Georgi Petrov', false);
+INSERT IGNORE INTO customers(id, fullName, customerStatus) values
+(1, 'Dimitar Dobrev', false),
+(2, 'Ivan Ivanov', false),
+(3, 'Georgi Petrov', false);
 
-INSERT IGNORE INTO employees(full_name, position_id) values
-('Daniel Petrov', 1) ,
-('Dobri Dimitrov', 2),
-('Radoslav Shushmanov', 1);
+INSERT IGNORE INTO employees(id, fullName, positionId) values
+(1, 'Daniel Petrov', 1) ,
+(2, 'Dobri Dimitrov', 2),
+(3, 'Radoslav Shushmanov', 1);
