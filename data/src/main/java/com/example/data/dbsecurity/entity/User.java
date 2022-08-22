@@ -3,6 +3,7 @@ package com.example.data.dbsecurity.entity;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -10,13 +11,10 @@ import javax.persistence.*;
 @Setter
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
-    private String name;
+    private String username;
     private String password;
-    private Long roleId;
+    private Boolean enabled;
 
-    @ManyToOne
-    @JoinColumn(name = "roleId", insertable = false, updatable = false)
-    private Role role;
+    @OneToMany(mappedBy = "user")
+    private Set<Authority> authorities;
 }
