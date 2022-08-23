@@ -69,7 +69,8 @@ public class RentCarProcessorCore implements RentCarProcessor {
                                                             .cardNumber(rentACarRequest.getCardNumber())
                                                             .totalPriceForRent(totalRentPrice)
                                                             .build()
-                                                    ))
+                                                    )
+                                            )
                                             .peek(x -> {
                                                 if(customerRepository
                                                         .getCustomerById(rentACarRequest.getCustomerId())
