@@ -2,6 +2,8 @@ package com.example.api.model;
 
 import com.example.api.base.OperationInput;
 
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -10,6 +12,8 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
+@Builder
+@EqualsAndHashCode
 public class RentACarRequest implements OperationInput {
     @Length(min = 17, max = 17)
     private String carVin;

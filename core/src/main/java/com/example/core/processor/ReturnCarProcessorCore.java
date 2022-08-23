@@ -35,42 +35,33 @@ public class ReturnCarProcessorCore implements ReturnCarProcessor {
         this.carRepository = carRepository;
     }
 
-
     @Override
     public Either<Error, ReturnCarResponse> process(ReturnCarRequest returnCarRequest) {
         return Try.of(() -> {
-                            Stream.of(carRentRepository)
-                                    .map(carRentRepository -> {
 
-                                                List<CarRent> carRents = carRentRepository
-                                                        .getCarRentsByCarId(
-                                                                returnCarRequest.getCarId()
-                                                        );
+                List<CarRent> carRents = carRentRepository
+                        .getCarRentsByCarId(
+                                returnCarRequest.getCarId()
+                        );
 
-                                                if(carRents.isEmpty()) {
-                                                    throw new RentNotFoundException();
-                                                }
+                if(carRents.isEmpty()) {
+                    throw new RentNotFoundException();
+                }
 
-                                                CarRent foundCarRent = carRents
-                                                        .stream()
-                                                        .filter(carRent -> carRent.getCar().getStatus().equals(true))
-                                                        .findFirst()
-                                                        .orElseThrow(CarNotTakenException::new);
+                CarRent foundCarRent = carRents
+                        .stream()
+                        .filter(carRent -> carRent.getCar().getStatus().equals(true))
+                        .findFirst()
+                        .orElseThrow(CarNotTakenException::new);
 
-                                                Car carToReturn = foundCarRent.getCar();
+                Car carToReturn = foundCarRent.getCar();
 
-                                                carToReturn.setStatus(false);
-                                                carRepository.save(carToReturn);
+                carToReturn.setStatus(false);
+                carRepository.save(carToReturn);
 
-                                                Customer customerToUpdate = foundCarRent.getCustomer();
-                                                customerToUpdate.setCustomerStatus(false);
-                                                customerRepository.save(customerToUpdate);
-
-                                                return true;
-                                            }
-                                    )
-                                    .findFirst()
-                                    .orElseThrow(RentNotFoundException::new);
+                Customer customerToUpdate = foundCarRent.getCustomer();
+                customerToUpdate.setCustomerStatus(false);
+                customerRepository.save(customerToUpdate);
 
                 return ReturnCarResponse
                         .builder()
