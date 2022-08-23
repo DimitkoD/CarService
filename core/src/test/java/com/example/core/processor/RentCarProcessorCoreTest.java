@@ -2,6 +2,8 @@ package com.example.core.processor;
 
 import com.example.api.PaymentFeignInterface;
 import com.example.api.base.Error;
+import com.example.api.error.PaymentServiceError;
+import com.example.api.error.PaymentServiceNotRespondingError;
 import com.example.api.model.RentACarRequest;
 import com.example.api.model.RentACarResponse;
 import com.example.api.operationPayment.PaymentServiceRequest;
@@ -15,6 +17,8 @@ import com.example.data.db.repository.CarRepository;
 import com.example.data.db.repository.CustomerRepository;
 import com.example.data.db.repository.EmployeeRepository;
 import com.example.data.rentclient.PriceService;
+import feign.FeignException;
+import feign.RetryableException;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +58,7 @@ class RentCarProcessorCoreTest {
     }
 
     @Test
-    public void rentTes() {
+    public void rentTest() {
 
         Car car1 = Car
                 .builder()
@@ -131,18 +135,26 @@ class RentCarProcessorCoreTest {
                 .message("Payment is successful!!!")
                 .build();
 
-        Mockito.when(paymentFeignInterface.pay(paymentServiceRequest))
-        .thenReturn(feignResponse);
-
         RentACarResponse rentACarResponse = RentACarResponse
                 .builder()
                 .output("Payment is successful!!!")
                 .build();
 
-        Assertions.assertEquals(feignResponse, paymentFeignInterface.pay(paymentServiceRequest));
+        Mockito.when(paymentFeignInterface.pay(paymentServiceRequest))
+                .thenReturn(feignResponse);
 
-        //Assertions.assertNotNull(rentCarProcessorCore.process(rentACarRequest).get());
+        Assertions.assertEquals(feignResponse, paymentFeignInterface.pay(paymentServiceRequest));
         Assertions.assertEquals(rentACarResponse, rentCarProcessorCore.process(rentACarRequest).get());
+
+        Mockito.when(paymentFeignInterface.pay(paymentServiceRequest))
+                .thenThrow(FeignException.FeignClientException.class);
+        PaymentServiceError paymentServiceError = new PaymentServiceError();
+        Assertions.assertEquals(paymentServiceError, rentCarProcessorCore.process(rentACarRequest).getLeft());
+
+//        Mockito.when(paymentFeignInterface.pay(paymentServiceRequest))
+//                .thenThrow(RetryableException.class);
+//        PaymentServiceNotRespondingError paymentServiceNotRespondingError = new PaymentServiceNotRespondingError();
+//        Assertions.assertEquals(paymentServiceNotRespondingError, rentCarProcessorCore.process(rentACarRequest).getLeft());getLeft
 
     }
 

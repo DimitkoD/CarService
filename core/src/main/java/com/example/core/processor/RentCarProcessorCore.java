@@ -25,10 +25,7 @@ import feign.RetryableException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class RentCarProcessorCore implements RentCarProcessor {
@@ -52,6 +49,7 @@ public class RentCarProcessorCore implements RentCarProcessor {
     @Override
     public Either<Error, RentACarResponse> process(RentACarRequest rentACarRequest) {
         return Try.of(() -> {
+
                     double totalRentPrice = priceService
                             .getPrice(rentACarRequest.getDays(),
                                     carRepository
@@ -60,69 +58,66 @@ public class RentCarProcessorCore implements RentCarProcessor {
                                             .orElseThrow(CarNotFoundException::new)
                                             .getPrice()
                             );
+
+                    PaymentServiceResponse paymentServiceResponse = paymentFeignInterface
+                                    .pay(PaymentServiceRequest
+                                            .builder()
+                                            .cardNumber(rentACarRequest.getCardNumber())
+                                            .totalPriceForRent(totalRentPrice)
+                                            .build()
+                                    );
+
+                    if(customerRepository
+                            .getCustomerById(rentACarRequest.getCustomerId())
+                            .orElseThrow(CustomerNotFoundException::new)
+                            .getCustomerStatus()
+                    ) {
+                        throw new CustomerHasAlreadyRentedException();
+                    }
+
+                    if(paymentServiceResponse.getResponseStatus().equals(200)) {
+                        carRentRepository
+                                .save(CarRent
+                                        .builder()
+                                        .carId(carRepository
+                                                .findCarByVin(rentACarRequest.getCarVin())
+                                                .orElseThrow(CarNotFoundException::new)
+                                                .getCarId()
+                                        )
+                                        .customerId(customerRepository
+                                                .getCustomerById(rentACarRequest.getCustomerId())
+                                                .orElseThrow(CustomerNotFoundException::new)
+                                                .getId()
+                                        )
+                                        .employeeId(employeeRepository
+                                                .getEmployeeById(rentACarRequest.getEmployeeId())
+                                                .orElseThrow(EmployeeNotFoundException::new)
+                                                .getId()
+                                        )
+                                        .date(LocalDate.now())
+                                        .days(rentACarRequest.getDays())
+                                        .price(totalRentPrice)
+                                        .build()
+                                );
+
+                        Car carToUpdate = carRepository
+                                .findCarByVin(rentACarRequest.getCarVin())
+                                .orElseThrow(CarNotFoundException::new);
+                        carToUpdate.setStatus(true);
+                        carRepository
+                                .save(carToUpdate);
+
+                        Customer customerToUpdate = customerRepository
+                                .getCustomerById(rentACarRequest.getCustomerId())
+                                .orElseThrow(CustomerNotFoundException::new);
+                        customerToUpdate.setCustomerStatus(true);
+                        customerRepository
+                                .save(customerToUpdate);
+                    }
+
                     return RentACarResponse
                             .builder()
-                            .output(
-                                    Stream.of(paymentFeignInterface
-                                                    .pay(PaymentServiceRequest
-                                                            .builder()
-                                                            .cardNumber(rentACarRequest.getCardNumber())
-                                                            .totalPriceForRent(totalRentPrice)
-                                                            .build()
-                                                    )
-                                            )
-                                            .peek(x -> {
-                                                if(customerRepository
-                                                        .getCustomerById(rentACarRequest.getCustomerId())
-                                                        .orElseThrow()
-                                                        .getCustomerStatus()
-                                                ) {
-                                                    throw new CustomerHasAlreadyRentedException();
-                                                }
-
-                                                if(x.getResponseStatus().equals(200)) {
-                                                    carRentRepository
-                                                            .save(CarRent
-                                                                    .builder()
-                                                                    .carId(carRepository
-                                                                            .findCarByVin(rentACarRequest.getCarVin())
-                                                                            .orElseThrow(CarNotFoundException::new)
-                                                                            .getCarId()
-                                                                    )
-                                                                    .customerId(customerRepository
-                                                                            .getCustomerById(rentACarRequest.getCustomerId())
-                                                                            .orElseThrow(CustomerNotFoundException::new)
-                                                                            .getId()
-                                                                    )
-                                                                    .employeeId(employeeRepository
-                                                                            .getEmployeeById(rentACarRequest.getEmployeeId())
-                                                                            .orElseThrow(EmployeeNotFoundException::new)
-                                                                            .getId()
-                                                                    )
-                                                                    .date(LocalDate.now())
-                                                                    .days(rentACarRequest.getDays())
-                                                                    .price(totalRentPrice)
-                                                                    .build()
-                                                            );
-
-                                                    Car carToUpdate = carRepository
-                                                            .findCarByVin(rentACarRequest.getCarVin())
-                                                            .orElseThrow(CarNotFoundException::new);
-                                                    carToUpdate.setStatus(true);
-                                                    carRepository
-                                                            .save(carToUpdate);
-
-                                                    Customer customerToUpdate =  customerRepository
-                                                            .getCustomerById(rentACarRequest.getCustomerId())
-                                                            .orElseThrow(CustomerNotFoundException::new);
-                                                    customerToUpdate.setCustomerStatus(true);
-                                                    customerRepository
-                                                            .save(customerToUpdate);
-                                                }
-                                            })
-                                            .map(PaymentServiceResponse::getMessage)
-                                            .collect(Collectors.joining())
-                            )
+                            .output(paymentServiceResponse.getMessage())
                             .build();
         })
         .toEither()
