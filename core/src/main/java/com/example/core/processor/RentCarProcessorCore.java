@@ -48,6 +48,7 @@ public class RentCarProcessorCore implements RentCarProcessor {
         this.employeeRepository = employeeRepository;
     }
 
+
     @Override
     public Either<Error, RentACarResponse> process(RentACarRequest rentACarRequest) {
         return Try.of(() -> {
@@ -68,9 +69,8 @@ public class RentCarProcessorCore implements RentCarProcessor {
                                                             .cardNumber(rentACarRequest.getCardNumber())
                                                             .totalPriceForRent(totalRentPrice)
                                                             .build()
-                                                    )
-                                            )
-                                            .peek(paymentServiceResponse -> {
+                                                    ))
+                                            .peek(x -> {
                                                 if(customerRepository
                                                         .getCustomerById(rentACarRequest.getCustomerId())
                                                         .orElseThrow()
@@ -79,7 +79,7 @@ public class RentCarProcessorCore implements RentCarProcessor {
                                                     throw new CustomerHasAlreadyRentedException();
                                                 }
 
-                                                if(paymentServiceResponse.getResponseStatus().equals(200)) {
+                                                if(x.getResponseStatus().equals(200)) {
                                                     carRentRepository
                                                             .save(CarRent
                                                                     .builder()

@@ -136,13 +136,13 @@ class RentCarProcessorCoreTest {
 
         RentACarResponse rentACarResponse = RentACarResponse
                 .builder()
-                .output("Payment is successful!")
+                .output("Payment is successful!!!")
                 .build();
 
         Assertions.assertEquals(feignResponse, paymentFeignInterface.pay(paymentServiceRequest));
 
-//        Assertions.assertNotNull(rentCarProcessorCore.process(rentACarRequest).get());
-//        Assertions.assertEquals(rentACarResponse,rentCarProcessorCore.process(rentACarRequest).get());
+        //Assertions.assertNotNull(rentCarProcessorCore.process(rentACarRequest).get());
+        Assertions.assertEquals(rentACarResponse, rentCarProcessorCore.process(rentACarRequest).get());
 
     }
 
