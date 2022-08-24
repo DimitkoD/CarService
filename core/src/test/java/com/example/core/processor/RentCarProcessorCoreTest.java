@@ -150,11 +150,55 @@ class RentCarProcessorCoreTest {
                 .thenThrow(FeignException.FeignClientException.class);
         PaymentServiceError paymentServiceError = new PaymentServiceError();
         Assertions.assertEquals(paymentServiceError, rentCarProcessorCore.process(rentACarRequest).getLeft());
+    }
 
-//        Mockito.when(paymentFeignInterface.pay(paymentServiceRequest))
-//                .thenThrow(RetryableException.class);
-//        PaymentServiceNotRespondingError paymentServiceNotRespondingError = new PaymentServiceNotRespondingError();
-//        Assertions.assertEquals(paymentServiceNotRespondingError, rentCarProcessorCore.process(rentACarRequest).getLeft());getLeft
+    @Test
+    public void feignRetryableTest() {
+        Car car1 = Car
+                .builder()
+                .carId(1L)
+                .vin("3G4AG55M8RS622999")
+                .price(25.0)
+                .status(false)
+                .build();
+
+        Customer customer1 = Customer
+                .builder()
+                .id(1L)
+                .fullName("Petko Ivanov")
+                .customerStatus(false)
+                .build();
+
+        Employee employee1 = Employee
+                .builder()
+                .id(1L)
+                .fullName("Petko Ivanov")
+                .positionId(1L)
+                .build();
+
+        RentACarRequest rentACarRequest = RentACarRequest
+                .builder()
+                .carVin(car1.getVin())
+                .cardNumber("1234567891234567")
+                .days(2)
+                .customerId(customer1.getId())
+                .employeeId(employee1.getId())
+                .build();
+
+        PaymentServiceRequest paymentServiceRequest = PaymentServiceRequest
+                .builder()
+                .cardNumber(rentACarRequest.getCardNumber())
+                .totalPriceForRent(priceService.getPrice(rentACarRequest.getDays(), car1.getPrice()))
+                .build();
+
+        Mockito.when(paymentFeignInterface.pay(paymentServiceRequest))
+                .thenThrow(RetryableException.class);
+
+        Mockito.when(carRepository.findCarByStatusAndVin(false, car1.getVin()))
+                .thenReturn(Optional.of(car1));
+
+        PaymentServiceNotRespondingError paymentServiceNotRespondingError = new PaymentServiceNotRespondingError();
+        Assertions.assertEquals(paymentServiceNotRespondingError, rentCarProcessorCore.process(rentACarRequest).getLeft());
 
     }
 

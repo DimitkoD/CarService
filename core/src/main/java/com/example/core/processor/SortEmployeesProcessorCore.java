@@ -67,7 +67,6 @@ public class SortEmployeesProcessorCore implements SortEmployeesProcessor {
                                     )
                     )
                     .build();
-
         })
         .toEither()
         .mapLeft(throwable -> {

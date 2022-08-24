@@ -1,9 +1,11 @@
 package com.example.api.error;
 
 import com.example.api.base.Error;
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 
 
+@EqualsAndHashCode
 public class RentsNotFoundError implements Error {
 
     @Override

@@ -67,7 +67,6 @@ public class SortCarsProcessorCore implements SortCarsProcessor {
                                     )
                     )
                     .build();
-
         })
         .toEither()
         .mapLeft(throwable -> {

@@ -1,14 +1,14 @@
 package com.example.core.processor;
 
-import com.example.api.model.ReturnCarRequest;
-import com.example.api.model.ReturnCarResponse;
+import com.example.api.error.RentsNotFoundError;
+import com.example.api.model.*;
+import com.example.core.exception.RentsNotFoundException;
 import com.example.data.db.entity.Car;
 import com.example.data.db.entity.CarRent;
 import com.example.data.db.entity.Customer;
 import com.example.data.db.entity.Employee;
 import com.example.data.db.repository.CarRentRepository;
-import com.example.data.db.repository.CarRepository;
-import com.example.data.db.repository.CustomerRepository;
+import com.example.data.db.repository.EmployeeRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,25 +18,27 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ReturnCarProcessorCoreTest {
+class SortEmployeesProcessorCoreTest {
+    @Mock
+    private EmployeeRepository employeeRepository;
     @Mock
     private CarRentRepository carRentRepository;
-    @Mock
-    private CustomerRepository customerRepository;
-    @Mock
-    private CarRepository carRepository;
     @InjectMocks
-    private ReturnCarProcessorCore returnCarProcessorCore;
+    private SortEmployeesProcessorCore sortEmployeesProcessorCore;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
     @Test
-    void returnCarTest() {
+    void sortTest() {
         Car car1 = Car
                 .builder()
                 .carId(1L)
@@ -56,6 +58,20 @@ class ReturnCarProcessorCoreTest {
                 .builder()
                 .id(1L)
                 .fullName("Petko Ivanov")
+                .positionId(1L)
+                .build();
+
+        Employee employee2 = Employee
+                .builder()
+                .id(2L)
+                .fullName("Ivan Ivanov")
+                .positionId(2L)
+                .build();
+
+        Employee employee3 = Employee
+                .builder()
+                .id(3L)
+                .fullName("Georgi Petkov")
                 .positionId(1L)
                 .build();
 
@@ -100,21 +116,47 @@ class ReturnCarProcessorCoreTest {
                 .date(LocalDate.now())
                 .build();
 
-        ReturnCarResponse returnCarResponse = ReturnCarResponse
+        Mockito.when(carRentRepository.findAll())
+                .thenReturn(List.of(carRent1, carRent2, carRent3));
+
+        Mockito.when(employeeRepository.findAll())
+                .thenReturn(List.of(employee1, employee2, employee3));
+
+        Mockito.when(carRentRepository.getCarRentsByEmployeeId(employee1.getId()))
+                .thenReturn(List.of(carRent1, carRent2, carRent3));
+
+        SortEmployeesRequest sortEmployeesRequest = SortEmployeesRequest
                 .builder()
-                .output("The car was successfully returned")
                 .build();
 
-        Mockito.when(carRentRepository.getCarRentsByCarId(returnCarRequest.getCarId()))
-                .thenReturn(List.of(carRent1, carRent2, carRent3));
-        Mockito.when(carRentRepository.save(carRent1))
-                .thenReturn(null);
+        Map<String, Integer> sortedEmployees = new HashMap<>();
+        sortedEmployees.put(employee1.getFullName(), 3);
+        sortedEmployees.put(employee2.getFullName(), 0);
+        sortedEmployees.put(employee3.getFullName(), 0);
+
+        SortEmployeesResponse sortEmployeesResponse = SortEmployeesResponse
+                .builder()
+                .sortedEmployeesByTimesRented(sortedEmployees)
+                .build();
+
+        Assertions.assertEquals(sortEmployeesResponse, sortEmployeesProcessorCore.process(sortEmployeesRequest).get());
+
+    }
+
+    @Test
+    void exceptionTest() {
+        SortEmployeesRequest sortEmployeesRequest = SortEmployeesRequest
+                .builder()
+                .build();
+
+        RentsNotFoundException rentsNotFoundException = new RentsNotFoundException();
+        RentsNotFoundError rentsNotFoundError = new RentsNotFoundError();
 
 
-        Mockito.when(customerRepository.save(customer1))
-                .thenReturn(null);
+        Mockito.when(carRentRepository.findAll())
+                .thenThrow(rentsNotFoundException);
 
-        Assertions.assertEquals(returnCarResponse, returnCarProcessorCore.process(returnCarRequest).get());
 
+        Assertions.assertEquals(rentsNotFoundError, sortEmployeesProcessorCore.process(sortEmployeesRequest).getLeft());
     }
 }
